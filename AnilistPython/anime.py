@@ -8,11 +8,10 @@ class Anime:
         self.extractInfo = ExtractInfo(access_info, activated)
         self.extractID = ExtractID(access_info, activated)
 
-
     def getAnime(self, anime_name, manual_select=False) -> dict:
         '''
         Retrieve anime info in the form of a json object.
-        Retrieve json object will be reformatted in a easily accessable json obj.
+        Retrieve json object will be reformatted in a easily accessible json obj.
 
         :param anime_name: The name of the anime
         :return: parsed dict containing the anime's data
@@ -22,26 +21,26 @@ class Anime:
         anime_id = self.getAnimeID(anime_name, manual_select)
         if anime_id == -1:
             return None
-
         data = self.extractInfo.anime(anime_id)
         media_lvl = data['data']['Media']
 
         name_romaji = media_lvl['title']['romaji']
         name_english = media_lvl['title']['english']
+        name_native = media_lvl['title']['native']
 
         start_year = media_lvl['startDate']['year']
         start_month = media_lvl['startDate']['month']
         start_day = media_lvl['startDate']['day']
 
-        end_year = media_lvl['endDate']['year']
-        end_month = media_lvl['endDate']['month']
-        end_day = media_lvl['endDate']['day']
+        end_year = media_lvl.get('endDate', {}).get('year', None)
+        end_month = media_lvl.get('endDate', {}).get('month', None)
+        end_day = media_lvl.get('endDate', {}).get('day', None)
 
-        starting_time = f'{start_month}/{start_day}/{start_year}'
-        ending_time = f'{end_month}/{end_day}/{end_year}'
+        starting_time = f"{start_month}/{start_day}/{start_year}"
+        ending_time = f"{end_month}/{end_day}/{end_year}" if end_year and end_month and end_day else "Still Airing"
 
         cover_image = media_lvl['coverImage']['large']
-        banner_image = media_lvl['bannerImage']
+        banner_image = media_lvl.get('bannerImage')
 
         airing_format = media_lvl['format']
         airing_status = media_lvl['status']
@@ -51,26 +50,58 @@ class Anime:
         desc = media_lvl['description']
 
         average_score = media_lvl['averageScore']
-        genres = media_lvl['genres']
+        mean_score = media_lvl['meanScore']
+        genres = ', '.join(media_lvl['genres'])
 
-        next_airing_ep = media_lvl['nextAiringEpisode']
+        synonyms = ', '.join(media_lvl['synonyms'])
+        sites_url = media_lvl['sitesUrl']
 
-        anime_dict = {"name_romaji": name_romaji,
-                    "name_english": name_english,
-                    "starting_time": starting_time,
-                    "ending_time": ending_time,
-                    "cover_image": cover_image,
-                    "banner_image": banner_image,
-                    "airing_format": airing_format,
-                    "airing_status": airing_status,
-                    "airing_episodes": airing_episodes,
-                    "season": season,
-                    "desc": desc,
-                    "average_score": average_score,
-                    "genres": genres,
-                    "next_airing_ep": next_airing_ep,}
+        if 'trailer' in media_lvl and media_lvl['trailer']:
+            trailer_id = media_lvl['trailer']['id']
+            trailer_site = media_lvl['trailer']['site']
+            trailer_thumbnail = media_lvl['trailer']['thumbnail']
+        else:
+            trailer_id, trailer_site, trailer_thumbnail = None, None, None
+
+        if 'nextAiringEpisode' in media_lvl and media_lvl['nextAiringEpisode']:
+            next_airing_at = media_lvl['nextAiringEpisode']['airingAt']
+            time_until_airing = media_lvl['nextAiringEpisode']['timeUntilAiring']
+            next_episode = media_lvl['nextAiringEpisode']['episode']
+        else:
+            next_airing_at, time_until_airing, next_episode = None, None, None
+
+        anime_dict = {
+            "name_romaji": name_romaji,
+            "name_english": name_english,
+            "name_native": name_native,
+            "starting_time": starting_time,
+            "ending_time": ending_time,
+            "cover_image": cover_image,
+            "banner_image": banner_image,
+            "airing_format": airing_format,
+            "airing_status": airing_status,
+            "airing_episodes": airing_episodes,
+            "season": season,
+            "description": desc,
+            "average_score": average_score,
+            "mean_score": mean_score,
+            "genres": genres,
+            "synonyms": synonyms,
+            "sites_url": sites_url,
+            "next_episode_details": {
+                "next_airing_at": next_airing_at,
+                "time_until_airing": time_until_airing,
+                "episode": next_episode
+            },
+            "trailer": {
+                "id": trailer_id,
+                "site": trailer_site,
+                "thumbnail": trailer_thumbnail
+            }
+        }
 
         return anime_dict
+
 
         
     def getAnimeWithID(self, anime_id) -> dict:
