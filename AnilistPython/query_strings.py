@@ -10,7 +10,7 @@ class QSData:
                     title {
                         romaji
                         english
-						native
+			native
                     }
                     startDate {
                         year
@@ -35,12 +35,12 @@ class QSData:
                     meanScore
                     genres
                     synonyms
-					sitesUrl
-					trailer{
-	 					id
-               			site 
-               			thumbnail
-          			}
+		    sitesUrl
+                    trailer{
+	 		id
+               		site 
+               		thumbnail
+		 }
                     nextAiringEpisode {
                         airingAt
                         timeUntilAiring
@@ -57,7 +57,7 @@ class QSData:
                     title {
                         romaji
                         english
-						native
+		        native
                     }
                     startDate {
                         year
@@ -122,7 +122,7 @@ class QSData:
                         last
                         native
                     }
-					siteUrl
+		    siteUrl
                     description
                     image {
                         large
