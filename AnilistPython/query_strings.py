@@ -35,7 +35,7 @@ class QSData:
                     meanScore
                     genres
                     synonyms
-		    sitesUrl
+		    siteUrl
                     trailer{
 	 		id
                		site 
